@@ -39,6 +39,9 @@ dependencies:
   get_storage: ^2.1.1
   intl: ^0.18.0
   json_annotation: ^4.8.1
+  path: ^1.8.3
+  path_provider: ^2.1.1
+  powersync: ^0.4.1
   shared_preferences: ^2.2.2
   smartstruct: ^1.4.0
   supabase_flutter: ^1.10.24

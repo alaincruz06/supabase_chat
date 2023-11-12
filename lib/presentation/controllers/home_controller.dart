@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_chat/data/datasources/providers/supabase_provider.dart';
-import 'package:supabase_chat/data/models/chat_summary_view_model.dart';
+import 'package:supabase_chat/data/models/chat_summary_model.dart';
 import 'package:supabase_chat/presentation/controllers/user_controller.dart';
 import 'package:supabase_chat/presentation/routes/app_pages.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -20,7 +20,9 @@ class HomeController extends GetxController {
   final UserController userController;
   final SupabaseClient supabaseClient;
   late RealtimeChannel realtimeChannel;
-  Stream<List<ChatSummaryViewModel>?> userChatsStream = const Stream.empty();
+
+  StreamSubscription<List<ChatSummaryModel>?>? userChatsSubscription;
+  RxList<ChatSummaryModel>? chats = <ChatSummaryModel>[].obs;
   RxString activeUserId = ''.obs;
 
   //#endregion
@@ -34,10 +36,11 @@ class HomeController extends GetxController {
     await getUserChats();
   }
 
-/*   @override
+  @override
   void dispose() {
+    userChatsSubscription?.cancel();
     super.dispose();
-  } */
+  }
 
 //#endregion
 
@@ -45,16 +48,13 @@ class HomeController extends GetxController {
 
   Future<void> getUserChats() async {
     try {
-      realtimeChannel = supabaseClient.channel('public:chats').on(
+      realtimeChannel = supabaseClient.channel('public:chat_summary').on(
           RealtimeListenTypes.postgresChanges,
-          ChannelFilter(event: '*', schema: 'public', table: 'chats'), (payload,
-              [ref]) {
-        debugPrint(
-            'Change received realtimeChannel on public:chats: ${payload.toString()}');
+          ChannelFilter(event: '*', schema: 'public', table: 'chat_summary'),
+          (payload, [ref]) {
         loadUserChatsStream();
       });
       realtimeChannel.subscribe();
-
       loadUserChatsStream();
     } catch (e) {
       debugPrint('Error on getUserChats: $e');
@@ -62,32 +62,32 @@ class HomeController extends GetxController {
   }
 
   void loadUserChatsStream() {
-    userChatsStream = supabaseProvider.getChatsStream(activeUserId.value);
+    userChatsSubscription =
+        supabaseProvider.getChatsStream(activeUserId.value).listen((chatsData) {
+      chats?.value = chatsData?.obs ?? <ChatSummaryModel>[].obs;
+    });
   }
 
   void addChat() {
     Get.toNamed(Routes.users);
   }
 
-  void goToChat(ChatSummaryViewModel chatSummaryViewModel) {
-    Get.toNamed(Routes.chat, arguments: {'chatSummmary': chatSummaryViewModel});
+  void goToChat(ChatSummaryModel chatSummaryModel) {
+    Get.toNamed(Routes.chat, arguments: {'chatSummmary': chatSummaryModel});
   }
 
-  String getOtherUsersNames(ChatSummaryViewModel chatSummaryViewModel) {
+  String getOtherUsersNames(ChatSummaryModel chatSummaryModel) {
     String names = '';
-    if (chatSummaryViewModel.usernames.length !=
-        chatSummaryViewModel.userIds.length) {
+    if (chatSummaryModel.usernames.length != chatSummaryModel.userIds.length) {
       throw ArgumentError(
           'The "usernames" and "usersIds" lists must have the same lenght');
     }
-    int activeUserIndex =
-        chatSummaryViewModel.userIds.indexOf(activeUserId.value);
-    if (chatSummaryViewModel.usernames.length !=
-        chatSummaryViewModel.userIds.length) {
+    int activeUserIndex = chatSummaryModel.userIds.indexOf(activeUserId.value);
+    if (chatSummaryModel.usernames.length != chatSummaryModel.userIds.length) {
       throw ArgumentError('User has not been foung in the chats list');
     }
 
-    var namesTemp = List.of(chatSummaryViewModel.usernames)
+    var namesTemp = List.of(chatSummaryModel.usernames)
       ..removeAt(activeUserIndex);
     names = namesTemp.join(', ');
 

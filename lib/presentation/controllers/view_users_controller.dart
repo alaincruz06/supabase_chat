@@ -5,9 +5,10 @@ import 'package:get/get.dart';
 import 'package:supabase_chat/core/utils.dart';
 import 'package:supabase_chat/data/datasources/providers/supabase_provider.dart';
 import 'package:supabase_chat/data/models/chat_messages_info_view_model.dart';
-import 'package:supabase_chat/data/models/chat_summary_view_model.dart';
+import 'package:supabase_chat/data/models/chat_summary_model.dart';
 import 'package:supabase_chat/data/models/chats_messages.dart';
 import 'package:supabase_chat/data/models/profile_model.dart';
+import 'package:supabase_chat/presentation/controllers/home_controller.dart';
 import 'package:supabase_chat/presentation/controllers/user_controller.dart';
 import 'package:supabase_chat/presentation/routes/app_pages.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -51,26 +52,28 @@ class ViewUsersController extends GetxController {
 
   void selectUser(String userId) async {
     try {
-      ChatSummaryViewModel? chatSummaryViewModel = await supabaseProvider
+      ChatSummaryModel? chatSummaryModel = await supabaseProvider
           .existsChatAlready(usersIds: [activeUserId.value, userId]);
-      if (chatSummaryViewModel != null) {
+      if (chatSummaryModel != null) {
         Get.offNamed(Routes.chat,
-            arguments: {'chatSummmary': chatSummaryViewModel});
+            arguments: {'chatSummmary': chatSummaryModel});
+        Get.find<HomeController>().loadUserChatsStream();
       } else {
         await supabaseProvider
             .createChat(usersIds: [activeUserId.value, userId]);
 
-        ChatSummaryViewModel? chatSummaryViewModel = await supabaseProvider
+        ChatSummaryModel? chatSummaryModel = await supabaseProvider
             .existsChatAlready(usersIds: [activeUserId.value, userId]);
 
         Get.offNamed(Routes.chat,
-            arguments: {'chatSummmary': chatSummaryViewModel});
+            arguments: {'chatSummmary': chatSummaryModel});
+        Get.find<HomeController>().loadUserChatsStream();
       }
-
-      debugPrint('userId: $userId');
     } on PostgrestException catch (error) {
+      debugPrint('Error on selectUser: $error');
       Get.context!.showErrorSnackBar(message: error.message);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error on selectUser: $e');
       Get.context!.showErrorSnackBar(message: 'app.unexpectedErrorMessage'.tr);
     }
   }

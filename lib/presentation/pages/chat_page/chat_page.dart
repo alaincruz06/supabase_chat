@@ -34,28 +34,11 @@ class ChatPage extends GetView<ChatController> {
                   physics: const BouncingScrollPhysics(),
                   controller: controller.messagesScrollController,
                   itemCount: controller.messages.length,
-                  itemBuilder: ((context, index) => controller
-                              .messages[index].userUuid ==
-                          controller.activeUserId.value
-                      ? ChatBubble(
-                          message: controller.messages[index],
-                          isMine: controller.messages[index].userUuid ==
-                              controller.activeUserId.value,
-                          profileName: '')
-                      : FutureBuilder(
-                          future:
-                              controller.getUser(controller.messages[index]),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return ChatBubble(
-                                  message: controller.messages[index],
-                                  isMine: controller.messages[index].userUuid ==
-                                      controller.activeUserId.value,
-                                  profileName: snapshot.data!.username);
-                            } else {
-                              return const PreloaderWidget();
-                            }
-                          })),
+                  itemBuilder: ((context, index) => ChatBubble(
+                      message: controller.messages[index],
+                      isMine: controller.messages[index].userUuid ==
+                          controller.activeUserId.value,
+                      controller: controller)),
                 ),
               ),
             ),

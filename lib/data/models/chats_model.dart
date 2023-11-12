@@ -22,7 +22,7 @@ class ChatsModel {
       : id = map['id'],
         lastMessage = map['last_message'],
         messageType = map['message_type'],
-        createdAt = DateTime.parse(map['created_at']);
+        createdAt = DateTime.parse(map['updated_at']);
 
   Map<String, dynamic> toJson() => {
         "last_message": lastMessage,

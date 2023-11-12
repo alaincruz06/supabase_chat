@@ -24,6 +24,10 @@ class MessageBar extends GetView<ChatController> {
                   autofocus: true,
                   controller: controller.textController,
                   decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      onPressed: () => controller.sendPhotos(),
+                      icon: const Icon(Icons.add_photo_alternate_outlined),
+                    ),
                     hintText: 'app.typeAMessage'.tr,
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,

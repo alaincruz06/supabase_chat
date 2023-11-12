@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_chat/data/datasources/providers/supabase_provider.dart';
-import 'package:supabase_chat/data/models/chat_messages_info_view_model.dart';
-import 'package:supabase_chat/data/models/chat_summary_view_model.dart';
+import 'package:supabase_chat/data/models/chat_summary_model.dart';
 import 'package:supabase_chat/data/models/chats_messages.dart';
 import 'package:supabase_chat/data/models/chats_model.dart';
 import 'package:supabase_chat/data/models/profile_model.dart';
@@ -53,7 +52,7 @@ class SupabaseProviderImpl extends SupabaseProvider {
       return _supabaseClient
           .from('profiles')
           .select()
-          .neq('user_ids', '{$userUuid}')
+          .neq('user_id', '{$userUuid}')
           .asStream()
           .map((event) {
         return event
@@ -73,20 +72,7 @@ class SupabaseProviderImpl extends SupabaseProvider {
   @override
   Stream<List<ChatsMessagesModel>>? getMessagesStream({required int chatId}) {
     try {
-      return _supabaseClient
-          .from('chats_messages')
-          .select()
-          .eq('chat_id', chatId)
-          .asStream()
-          .map((event) {
-        return event
-            .map((record) {
-              final recordAsMap = record as Map<String, dynamic>;
-              return ChatsMessagesModel.fromMap(recordAsMap);
-            })
-            .toList()
-            .cast<ChatsMessagesModel>();
-      });
+      return ChatsMessagesModel.watchMessages(chatId);
     } catch (e) {
       debugPrint('Error on getChatsStream: $e');
       return const Stream.empty();
@@ -94,39 +80,49 @@ class SupabaseProviderImpl extends SupabaseProvider {
   }
 
   @override
-  Future<ChatSummaryViewModel?> existsChatAlready(
+  Future<ChatSummaryModel?>? existsChatAlready(
       {required List<String> usersIds}) {
-    return _supabaseClient
-        .from('chat_summary_view')
-        .select()
-        .eq('usernames', usersIds)
-        .maybeSingle()
-        .then((event) {
-      if (event.isNotEmpty) {
-        final chatSummaryMap = event as Map<String, dynamic>;
-        return ChatSummaryViewModel.fromMap(chatSummaryMap);
-      } else {
-        return null;
-      }
-    });
+    try {
+      return _supabaseClient
+          .from('chat_summary')
+          .select()
+          .contains('user_ids', usersIds)
+          .containedBy('user_ids', usersIds)
+          .maybeSingle()
+          .then((event) {
+        if (event != null) {
+          final chatSummaryMap = event as Map<String, dynamic>;
+          return ChatSummaryModel.fromMap(chatSummaryMap);
+        } else {
+          return null;
+        }
+      });
+    } catch (e) {
+      debugPrint('Error on existsChatAlready: $e');
+      return null;
+    }
   }
 
   @override
-  Stream<List<ChatSummaryViewModel>?> getChatsStream(String myUserId) {
+  Stream<List<ChatSummaryModel>?> getChatsStream(String myUserId) {
     try {
+      //commented because sql query not returning all rows
+      // return ChatSummaryModel.watchChats(myUserId);
+
       return _supabaseClient
-          .from('chat_summary_view')
+          .from('chat_summary')
           .select()
           .contains('user_ids', '{$myUserId}')
+          .order('updated_at')
           .asStream()
           .map((event) {
         return event
             .map((record) {
               final recordAsMap = record as Map<String, dynamic>;
-              return ChatSummaryViewModel.fromMap(recordAsMap);
+              return ChatSummaryModel.fromMap(recordAsMap);
             })
             .toList()
-            .cast<ChatSummaryViewModel>();
+            .cast<ChatSummaryModel>();
       });
     } catch (e) {
       debugPrint('Error on getChatsStream: $e');
@@ -138,9 +134,7 @@ class SupabaseProviderImpl extends SupabaseProvider {
   Future<void> sendMessage(
       {required ChatsMessagesModel chatsMessagesModel}) async {
     try {
-      await _supabaseClient
-          .from('chats_messages')
-          .insert(chatsMessagesModel.toJson());
+      await ChatsMessagesModel.createMessage(chatsMessagesModel);
     } catch (e) {
       debugPrint('Error on sendMessage: $e');
     }
@@ -162,9 +156,11 @@ class SupabaseProviderImpl extends SupabaseProvider {
         if (event.isNotEmpty) {
           final chat = event as Map<String, dynamic>;
 
-          await _supabaseClient.from('chats_users').insert(usersIds.map((e) => [
-                {'chat_id': chat['id'], 'user_id': e},
-              ]));
+          for (var userId in usersIds) {
+            await _supabaseClient.from('chats_users').insert(
+              {'chat_id': chat['id'], 'user_id': userId},
+            );
+          }
         }
       });
     } catch (e) {

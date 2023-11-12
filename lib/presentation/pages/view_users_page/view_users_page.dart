@@ -30,6 +30,10 @@ class ViewUsersPage extends GetView<ViewUsersController> {
                   );
                 },
               );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text(snapshot.error.toString()),
+              );
             } else {
               return const PreloaderWidget();
             }

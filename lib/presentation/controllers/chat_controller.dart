@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_chat/core/utils.dart';
 import 'package:supabase_chat/data/datasources/providers/supabase_provider.dart';
-import 'package:supabase_chat/data/models/chat_summary_view_model.dart';
+import 'package:supabase_chat/data/models/chat_summary_model.dart';
 import 'package:supabase_chat/data/models/chats_messages.dart';
 import 'package:supabase_chat/data/models/profile_model.dart';
 import 'package:supabase_chat/presentation/controllers/user_controller.dart';
@@ -31,7 +31,7 @@ class ChatController extends GetxController {
   final TextEditingController textController = TextEditingController();
 
   //late vars
-  late ChatSummaryViewModel chatSummaryViewModel;
+  late ChatSummaryModel chatSummaryModel;
 
   //#endregion
 
@@ -41,8 +41,7 @@ class ChatController extends GetxController {
   void onInit() async {
     super.onInit();
     activeUserId.value = userController.profileDomain.value.userId;
-    chatSummaryViewModel =
-        Get.arguments['chatSummmary'] as ChatSummaryViewModel;
+    chatSummaryModel = Get.arguments['chatSummmary'] as ChatSummaryModel;
     await getMessages();
 
     // Add listener to the list
@@ -81,23 +80,31 @@ class ChatController extends GetxController {
   }
 
   void loadMessagesStream() {
-    chatMessagesSubscription = supabaseProvider
-        .getMessagesStream(chatId: chatSummaryViewModel.chatId)
-        ?.listen((chatsData) {
-      messages.value = chatsData.obs;
-    });
+    try {
+      chatMessagesSubscription = supabaseProvider
+          .getMessagesStream(chatId: chatSummaryModel.chatId)
+          ?.listen((chatsData) {
+        messages.value = chatsData.obs;
+      });
+    } catch (e) {
+      debugPrint('Error on loadMessagesStream: $e');
+    }
   }
 
   Future<ProfileModel> getUser(ChatsMessagesModel chat) async {
     return await supabaseProvider.getUser(userUuid: chat.userUuid);
   }
 
+  void sendPhotos() {}
+
   void goToBottom() {
-    messagesScrollController.animateTo(
-      maxExtent.value,
-      duration: const Duration(microseconds: 200),
-      curve: Curves.easeInOut,
-    );
+    if (messagesScrollController.hasClients) {
+      messagesScrollController.animateTo(
+        maxExtent.value,
+        duration: const Duration(microseconds: 200),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   void submitMessage() async {
@@ -110,7 +117,7 @@ class ChatController extends GetxController {
       //TODO differents messageTypes
       await supabaseProvider.sendMessage(
           chatsMessagesModel: ChatsMessagesModel(
-              chatId: chatSummaryViewModel.chatId,
+              chatId: chatSummaryModel.chatId,
               userId: userController.profileDomain.value.id,
               userUuid: userController.profileDomain.value.userId,
               message: text,
