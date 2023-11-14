@@ -15,5 +15,6 @@ const Map<String, String> enUS = {
   'app.typeAMessage': 'Type a message',
   'app.send': 'Send',
   'app.users': 'Users',
+  'app.image': 'Image',
   'app.startYourConversationNow': 'Start your conversation now :)',
 };

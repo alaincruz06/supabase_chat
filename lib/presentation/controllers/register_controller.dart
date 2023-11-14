@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:supabase_chat/core/utils.dart';
+import 'package:supabase_chat/core/extensions.dart';
 import 'package:supabase_chat/data/datasources/providers/supabase_provider.dart';
 import 'package:supabase_chat/presentation/routes/app_pages.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

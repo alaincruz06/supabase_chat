@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_chat/core/utils.dart';
+import 'package:supabase_chat/core/extensions.dart';
 import 'package:supabase_chat/data/datasources/providers/supabase_provider.dart';
 import 'package:supabase_chat/presentation/controllers/user_controller.dart';
 import 'package:supabase_chat/presentation/routes/app_pages.dart';

@@ -24,7 +24,18 @@ class HomePage extends GetView<HomeController> {
               subtitle:
                   controller.chats?[index].messageType == MessageType.text.name
                       ? Text(controller.chats?[index].lastMessage ?? '')
-                      : const SizedBox(),
+                      : controller.chats?[index].messageType ==
+                              MessageType.photo.name
+                          ? Row(
+                              children: [
+                                const Icon(Icons.image),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 5.0),
+                                  child: Text('app.image'.tr),
+                                ),
+                              ],
+                            )
+                          : const SizedBox(),
               trailing: SizedBox(
                 width: 60,
                 child: Row(

@@ -16,5 +16,6 @@ const Map<String, String> esEs = {
   'app.typeAMessage': 'Escribe un mensaje',
   'app.send': 'Enviar',
   'app.users': 'Usuarios',
+  'app.image': 'Imagen',
   'app.startYourConversationNow': 'Comienza tu conversación ahora :)',
 };

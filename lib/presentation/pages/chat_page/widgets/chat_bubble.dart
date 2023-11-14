@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:supabase_chat/core/constants.dart';
+import 'package:supabase_chat/core/function_utils.dart';
 import 'package:supabase_chat/data/models/chat_messages_info_view_model.dart';
 import 'package:supabase_chat/data/models/chats_messages.dart';
 import 'package:supabase_chat/domain/models/message_domain.dart';
@@ -44,6 +47,11 @@ class ChatBubble extends StatelessWidget {
               isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Container(
+              height:
+                  message.messageType == MessageType.photo.name ? 150 : null,
+              width: message.messageType == MessageType.photo.name
+                  ? Get.width * 0.5
+                  : null,
               padding: const EdgeInsets.symmetric(
                 vertical: 8,
                 horizontal: 12,
@@ -53,7 +61,20 @@ class ChatBubble extends StatelessWidget {
                     !isMine ? Theme.of(context).primaryColor : Colors.grey[300],
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(message.message),
+              child: message.messageType == MessageType.photo.name
+                  ? FutureBuilder(
+                      future: FunctionUtils.base64decodeImageFromBase64String(
+                          message.message),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Image.memory(snapshot.data!);
+                        } else if (snapshot.hasError) {
+                          return Text(snapshot.error.toString());
+                        } else {
+                          return const PreloaderWidget();
+                        }
+                      })
+                  : Text(message.message),
             ),
             Text(format(message.createdAt!, locale: 'en_short')),
           ],

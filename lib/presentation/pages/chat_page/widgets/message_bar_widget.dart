@@ -25,7 +25,7 @@ class MessageBar extends GetView<ChatController> {
                   controller: controller.textController,
                   decoration: InputDecoration(
                     suffixIcon: IconButton(
-                      onPressed: () => controller.sendPhotos(),
+                      onPressed: () => controller.pickPhotos(),
                       icon: const Icon(Icons.add_photo_alternate_outlined),
                     ),
                     hintText: 'app.typeAMessage'.tr,

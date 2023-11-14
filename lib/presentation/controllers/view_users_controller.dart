@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:supabase_chat/core/utils.dart';
+import 'package:supabase_chat/core/extensions.dart';
 import 'package:supabase_chat/data/datasources/providers/supabase_provider.dart';
 import 'package:supabase_chat/data/models/chat_messages_info_view_model.dart';
 import 'package:supabase_chat/data/models/chat_summary_model.dart';
