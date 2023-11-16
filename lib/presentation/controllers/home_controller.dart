@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_chat/data/datasources/providers/supabase_provider.dart';
 import 'package:supabase_chat/data/models/chat_summary_model.dart';
 import 'package:supabase_chat/presentation/controllers/user_controller.dart';
@@ -42,7 +43,7 @@ class HomeController extends GetxController {
     super.dispose();
   }
 
-//#endregion
+  //#endregion
 
   //#region Functions
 
@@ -92,6 +93,13 @@ class HomeController extends GetxController {
     names = namesTemp.join(', ');
 
     return names;
+  }
+
+  Future<void> signOut() async {
+    supabaseProvider.signOut();
+    final prefs = Get.find<SharedPreferences>();
+    await prefs.remove('session_data');
+    Get.offAllNamed(Routes.register, predicate: (route) => false);
   }
 
   //#endregion

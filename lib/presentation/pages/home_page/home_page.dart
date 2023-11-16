@@ -10,7 +10,14 @@ class HomePage extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chats')),
+      appBar: AppBar(
+        title: const Text('Chats'),
+        actions: [
+          IconButton(
+              onPressed: () => controller.signOut(),
+              icon: const Icon(Icons.logout))
+        ],
+      ),
       body: Obx(
         () => ListView.builder(
           physics: const BouncingScrollPhysics(),

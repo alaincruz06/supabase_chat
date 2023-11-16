@@ -37,6 +37,11 @@ class SupabaseProviderImpl extends SupabaseProvider {
   }
 
   @override
+  Future<void> signOut() async {
+    return await _supabaseClient.auth.signOut();
+  }
+
+  @override
   Future<ProfileModel> getUser({required String userUuid}) async {
     final Map<String, dynamic> response = await _supabaseClient
         .from('profiles')

@@ -11,6 +11,7 @@ abstract class SupabaseProvider {
       {required String username,
       required String email,
       required String password});
+  Future<void> signOut();
   Future<ProfileModel> getUser({required String userUuid});
   Stream<List<ProfileModel>>? getAvailableUsers({required String userUuid});
   Stream<List<ChatsMessagesModel>>? getMessagesStream({required int chatId});
