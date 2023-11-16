@@ -1,10 +1,9 @@
 const Map<String, String> esEs = {
   //#region MESSAGES
-
-  //#region ERRORS
-  /// Error message to display the user when unexpected error occurs.
-  'app.unexpectedErrorMessage': 'Un error no esperado ha ocurrido.',
+  'app.yourSessionHasExpired':
+      'Su sesión ha expirado, por favor, inicie sesión nuevamente.',
   'app.iAlreadyHaveAnAccount': 'Ya tengo una cuenta',
+  'app.iDontHaveAnAccount': 'No tengo una cuenta',
   'app.register': 'Registrar',
   'app.signIn': 'Iniciar sesión',
   'app.required': 'Requerido',
@@ -17,5 +16,12 @@ const Map<String, String> esEs = {
   'app.send': 'Enviar',
   'app.users': 'Usuarios',
   'app.image': 'Imagen',
+  'app.pickPhotos': 'Seleccionar fotos',
+  'app.takePhotos': 'Tomar fotos',
+  'app.pickVideos': 'Seleccionar videos',
+  'app.takeVideos': 'Tomar videos',
   'app.startYourConversationNow': 'Comienza tu conversación ahora :)',
+
+  //#region ERRORS
+  'app.unexpectedErrorMessage': 'Un error no esperado ha ocurrido.',
 };
