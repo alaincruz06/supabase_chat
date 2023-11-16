@@ -80,7 +80,7 @@ class RegisterPage extends GetView<RegisterController> {
             ),
             formSpacer,
             TextButton(
-              onPressed: () => Get.toNamed(Routes.login),
+              onPressed: () => Get.offAllNamed(Routes.login),
               child: Text('app.iAlreadyHaveAnAccount'.tr),
             )
           ],

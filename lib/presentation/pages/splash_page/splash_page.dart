@@ -54,10 +54,10 @@ class SplashPageState extends State<SplashPage> {
           Get.offAllNamed(Routes.home, predicate: (route) => false);
         } catch (e) {
           debugPrint('Error at SplashPage - _redirect: $e');
-          Get.offAllNamed(Routes.register, predicate: (route) => false);
+          Get.offAllNamed(Routes.login);
         }
       } else {
-        Get.offAllNamed(Routes.register, predicate: (route) => false);
+        Get.offAllNamed(Routes.login);
       }
     } catch (e) {
       debugPrint('Error on SplashPage - _redirect: $e');
