@@ -16,6 +16,7 @@ const Map<String, String> esEs = {
   'app.send': 'Enviar',
   'app.users': 'Usuarios',
   'app.image': 'Imagen',
+  'app.voiceNote': 'Nota de voz',
   'app.pickPhotos': 'Seleccionar fotos',
   'app.takePhotos': 'Tomar fotos',
   'app.pickVideos': 'Seleccionar videos',

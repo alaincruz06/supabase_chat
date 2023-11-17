@@ -15,6 +15,7 @@ const Map<String, String> enUS = {
   'app.send': 'Send',
   'app.users': 'Users',
   'app.image': 'Image',
+  'app.voiceNote': 'Voice note',
   'app.pickPhotos': 'Pick photos',
   'app.takePhotos': 'Take photos',
   'app.pickVideos': 'Pick videos',

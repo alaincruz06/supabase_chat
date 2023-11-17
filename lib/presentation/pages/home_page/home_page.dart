@@ -42,7 +42,18 @@ class HomePage extends GetView<HomeController> {
                                 ),
                               ],
                             )
-                          : const SizedBox(),
+                          : controller.chats?[index].messageType ==
+                                  MessageType.audio.name
+                              ? Row(
+                                  children: [
+                                    const Icon(Icons.audiotrack),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 5.0),
+                                      child: Text('app.voiceNote'.tr),
+                                    ),
+                                  ],
+                                )
+                              : const SizedBox(),
               trailing: SizedBox(
                 width: 60,
                 child: Row(
