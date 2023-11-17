@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
@@ -14,10 +13,11 @@ import 'package:supabase_chat/data/datasources/providers/supabase_provider.dart'
 import 'package:supabase_chat/data/models/chat_summary_model.dart';
 import 'package:supabase_chat/data/models/chats_messages.dart';
 import 'package:supabase_chat/data/models/profile_model.dart';
+import 'package:supabase_chat/presentation/controllers/audio_record/audio_recorder_io.dart';
 import 'package:supabase_chat/presentation/controllers/user_controller.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class ChatController extends GetxController {
+class ChatController extends GetxController with AudioRecorderMixin {
   ChatController({
     required this.supabaseProvider,
     required this.supabaseClient,
@@ -61,6 +61,7 @@ class ChatController extends GetxController {
 
   @override
   void dispose() {
+    // Dispose controllers
     chatMessagesSubscription?.cancel();
     messagesScrollController.dispose();
     textController.dispose();
@@ -105,59 +106,49 @@ class ChatController extends GetxController {
   }
 
   Future<void> pickPhotos() async {
-    try {
-      // Pick an image.
-      final XFile? image =
-          await imagePicker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        File imageFile = File(image.path);
-        //Create temporary file from XFile
-        Directory dir = await getApplicationDocumentsDirectory();
-        final tempImagePath = join(dir.path, 'temp-image.jpg');
+    // Pick images.
+    final List<XFile> images = await imagePicker.pickMultiImage();
+    if (images.isNotEmpty) {
+      for (var image in images) {
+        compressAndSendImage(image);
+      }
+    }
+  }
 
-        //Compress image from file and return XFile?
-        XFile? compressedImage = await FlutterImageCompress.compressAndGetFile(
-          imageFile.absolute.path,
-          tempImagePath,
-          quality: 88,
-          minWidth: 1280,
-          minHeight: 720,
-        );
-        if (compressedImage != null) {
-          //Encode image to base64
-          String base64Image = await FunctionUtils.base64encodedImageFromPath(
-              compressedImage.path);
-          await supabaseProvider.sendMessage(
-              chatsMessagesModel: ChatsMessagesModel(
-                  chatId: chatSummaryModel.chatId,
-                  userId: userController.profileDomain.value.id,
-                  userUuid: userController.profileDomain.value.userId,
-                  message: base64Image,
-                  messageType: MessageType.photo.name));
-          textController.clear();
-          //Delete temporary file
-          // File(tempImagePath).delete();
-          await getMessages();
-        }
+  Future<void> takePhotos() async {
+    // Capture an image.
+    final XFile? image =
+        await imagePicker.pickImage(source: ImageSource.camera);
+    if (image != null) {
+      compressAndSendImage(image);
+    }
+  }
+
+  Future<void> compressAndSendImage(XFile image) async {
+    try {
+      File imageFile = File(image.path);
+      //Create temporary file from XFile
+      Directory dir = await getApplicationDocumentsDirectory();
+      final tempImagePath = join(dir.path, 'temp-image.jpg');
+
+      //Compress image from file and return XFile?
+      XFile? compressedImage = await FlutterImageCompress.compressAndGetFile(
+        imageFile.absolute.path,
+        tempImagePath,
+        quality: 88,
+        minWidth: 1280,
+        minHeight: 720,
+      );
+      if (compressedImage != null) {
+        //Encode image to base64
+        String base64Image = await FunctionUtils.base64encodedImageFromPath(
+            compressedImage.path);
+        submitMessage(
+            messageToSend: base64Image, messageType: MessageType.photo);
       }
     } catch (e) {
-      debugPrint('Error pickPhotos: $e');
+      debugPrint('Error compressAndSendImage: $e');
     }
-/* // Capture a photo.
-    final XFile? photo =
-        await imagePicker.pickImage(source: ImageSource.camera);
-// Pick a video.
-    final XFile? galleryVideo =
-        await imagePicker.pickVideo(source: ImageSource.gallery);
-// Capture a video.
-    final XFile? cameraVideo =
-        await imagePicker.pickVideo(source: ImageSource.camera);
-// Pick multiple images.
-    final List<XFile> images = await imagePicker.pickMultiImage();
-// Pick singe image or video.
-    final XFile? media = await imagePicker.pickMedia();
-// Pick multiple images and videos.
-    final List<XFile> medias = await imagePicker.pickMultipleMedia(); */
   }
 
   void goToBottom() {
@@ -170,20 +161,19 @@ class ChatController extends GetxController {
     }
   }
 
-  void submitMessage() async {
-    final text = textController.text;
-    if (text.isEmpty) {
+  void submitMessage(
+      {required String messageToSend, required MessageType messageType}) async {
+    if (messageToSend.isEmpty) {
       return;
     }
     try {
-      //TODO differents messageTypes
       await supabaseProvider.sendMessage(
           chatsMessagesModel: ChatsMessagesModel(
               chatId: chatSummaryModel.chatId,
               userId: userController.profileDomain.value.id,
               userUuid: userController.profileDomain.value.userId,
-              message: text,
-              messageType: MessageType.text.name));
+              message: messageToSend,
+              messageType: messageType.name));
       textController.clear();
       await getMessages();
     } on PostgrestException catch (error) {
