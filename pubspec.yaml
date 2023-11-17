@@ -28,8 +28,6 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  audio_waveforms: ^1.0.4
-  audioplayers: ^5.2.1
   cupertino_icons: ^1.0.5
   envied: ^0.3.0+3
   flutter:
@@ -46,7 +44,6 @@ dependencies:
   path: ^1.8.3
   path_provider: ^2.1.1
   powersync: ^0.4.1
-  record: ^5.0.1
   shared_preferences: ^2.2.2
   smartstruct: ^1.4.0
   supabase_flutter: ^1.10.24

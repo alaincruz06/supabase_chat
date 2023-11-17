@@ -50,10 +50,6 @@ class MessageBar extends GetView<ChatController> {
                   Icons.send,
                 ),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.mic),
-              ),
             ],
           ),
         ),
