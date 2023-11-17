@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_chat/core/constants.dart';
 import 'package:supabase_chat/core/extensions.dart';
@@ -13,11 +13,10 @@ import 'package:supabase_chat/data/datasources/providers/supabase_provider.dart'
 import 'package:supabase_chat/data/models/chat_summary_model.dart';
 import 'package:supabase_chat/data/models/chats_messages.dart';
 import 'package:supabase_chat/data/models/profile_model.dart';
-import 'package:supabase_chat/presentation/controllers/audio_record/audio_recorder_io.dart';
 import 'package:supabase_chat/presentation/controllers/user_controller.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class ChatController extends GetxController with AudioRecorderMixin {
+class ChatController extends GetxController {
   ChatController({
     required this.supabaseProvider,
     required this.supabaseClient,
@@ -65,6 +64,7 @@ class ChatController extends GetxController with AudioRecorderMixin {
     chatMessagesSubscription?.cancel();
     messagesScrollController.dispose();
     textController.dispose();
+
     super.dispose();
   }
 
@@ -76,10 +76,8 @@ class ChatController extends GetxController with AudioRecorderMixin {
     try {
       realtimeChannel = supabaseClient.channel('public:chats_messages').on(
           RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-              event: 'INSERT',
-              schema: 'public',
-              table: 'chats_messages'), (payload, [ref]) {
+          ChannelFilter(event: '*', schema: 'public', table: 'chats_messages'),
+          (payload, [ref]) {
         loadMessagesStream();
       });
       realtimeChannel.subscribe();
@@ -129,7 +127,7 @@ class ChatController extends GetxController with AudioRecorderMixin {
       File imageFile = File(image.path);
       //Create temporary file from XFile
       Directory dir = await getApplicationDocumentsDirectory();
-      final tempImagePath = join(dir.path, 'temp-image.jpg');
+      final tempImagePath = p.join(dir.path, 'temp-image.jpg');
 
       //Compress image from file and return XFile?
       XFile? compressedImage = await FlutterImageCompress.compressAndGetFile(
