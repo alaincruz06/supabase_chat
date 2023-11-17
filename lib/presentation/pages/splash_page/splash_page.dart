@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_chat/core/extensions.dart';
 import 'package:supabase_chat/presentation/controllers/user_controller.dart';
 import 'package:supabase_chat/presentation/routes/app_pages.dart';
 import 'package:supabase_chat/presentation/widgets/preloader_widget.dart';
@@ -52,8 +53,18 @@ class SplashPageState extends State<SplashPage> {
           prefs.setString(
               'session_data', response.session!.persistSessionString);
           Get.offAllNamed(Routes.home, predicate: (route) => false);
+        } on AuthException {
+          try {
+            // Refresh the token before navigating to the login screen
+            await supabaseClient.auth.refreshSession();
+          } catch (e) {
+            // Handle refresh token failure, navigate to login, and show error
+            Get.offAllNamed(Routes.login);
+            Get.context!
+                .showErrorSnackBar(message: 'app.yourSessionHasExpired'.tr);
+          }
         } catch (e) {
-          debugPrint('Error at SplashPage - _redirect: $e');
+          debugPrint('Error at SplashPage - Unknown Exception: $e');
           Get.offAllNamed(Routes.login);
         }
       } else {
