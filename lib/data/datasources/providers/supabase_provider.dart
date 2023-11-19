@@ -1,4 +1,3 @@
-import 'package:supabase_chat/data/models/chat_messages_info_view_model.dart';
 import 'package:supabase_chat/data/models/chat_summary_model.dart';
 import 'package:supabase_chat/data/models/chats_messages.dart';
 import 'package:supabase_chat/data/models/profile_model.dart';

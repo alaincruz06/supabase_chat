@@ -2,15 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_chat/core/constants.dart';
 import 'package:supabase_chat/core/function_utils.dart';
-import 'package:supabase_chat/data/models/chat_messages_info_view_model.dart';
 import 'package:supabase_chat/data/models/chats_messages.dart';
-import 'package:supabase_chat/domain/models/message_domain.dart';
-import 'package:supabase_chat/domain/models/profile_domain.dart';
+import 'package:supabase_chat/data/models/profile_model.dart';
 import 'package:supabase_chat/presentation/controllers/chat_controller.dart';
 import 'package:supabase_chat/presentation/widgets/preloader_widget.dart';
 import 'package:timeago/timeago.dart';
-
-import '../../../../data/models/profile_model.dart';
 
 class ChatBubble extends StatelessWidget {
   const ChatBubble({

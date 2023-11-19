@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:supabase_chat/core/constants.dart';
-import 'package:supabase_chat/domain/models/message_domain.dart';
 import 'package:supabase_chat/presentation/controllers/chat_controller.dart';
 import 'package:supabase_chat/presentation/pages/chat_page/widgets/chat_bubble.dart';
 import 'package:supabase_chat/presentation/pages/chat_page/widgets/message_bar_widget.dart';

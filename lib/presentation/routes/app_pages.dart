@@ -6,7 +6,6 @@ import 'package:supabase_chat/presentation/bindings/home_binding.dart';
 import 'package:supabase_chat/presentation/bindings/login_binding.dart';
 import 'package:supabase_chat/presentation/bindings/register_binding.dart';
 import 'package:supabase_chat/presentation/bindings/view_users_binding.dart';
-import 'package:supabase_chat/presentation/controllers/view_users_controller.dart';
 import 'package:supabase_chat/presentation/pages/chat_page/chat_page.dart';
 import 'package:supabase_chat/presentation/pages/home_page/home_page.dart';
 import 'package:supabase_chat/presentation/pages/login_page/login_page.dart';
