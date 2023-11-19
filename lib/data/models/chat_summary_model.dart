@@ -1,9 +1,3 @@
-import 'dart:convert';
-
-import 'package:get/get.dart';
-import 'package:powersync/powersync.dart';
-import 'package:powersync/sqlite3.dart' as sqlite;
-
 class ChatSummaryModel {
   ChatSummaryModel({
     required this.chatId,
@@ -39,27 +33,4 @@ class ChatSummaryModel {
         lastMessage = map['last_message'],
         messageType = map['message_type'],
         updatedAt = DateTime.parse(map['updated_at']);
-
-  factory ChatSummaryModel.fromRow(sqlite.Row row) {
-    return ChatSummaryModel(
-        chatId: row['chat_id'],
-        userIds: List<String>.from(jsonDecode(row['user_ids'])),
-        usernames: List<String>.from(jsonDecode(row['usernames'])),
-        updatedAt: DateTime.parse(row['updated_at']),
-        lastMessage: row['last_message'],
-        messageType: row['message_type']);
-  }
-
-  static Stream<List<ChatSummaryModel>> watchChats(String myUserId) {
-    return Get.find<PowerSyncDatabase>()
-        .watch(
-            "SELECT * FROM chat_summary WHERE user_ids LIKE '%$myUserId%' ORDER BY updated_at asc")
-        .map(
-          (event) => event
-              .map(
-                (e) => ChatSummaryModel.fromRow(e),
-              )
-              .toList(growable: false),
-        );
-  }
 }

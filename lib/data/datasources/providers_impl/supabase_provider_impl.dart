@@ -77,7 +77,20 @@ class SupabaseProviderImpl extends SupabaseProvider {
   @override
   Stream<List<ChatsMessagesModel>>? getMessagesStream({required int chatId}) {
     try {
-      return ChatsMessagesModel.watchMessages(chatId);
+      return _supabaseClient
+          .from('chats_messages')
+          .select()
+          .eq('chat_id', chatId)
+          .asStream()
+          .map((event) {
+        return event
+            .map((record) {
+              final recordAsMap = record as Map<String, dynamic>;
+              return ChatsMessagesModel.fromMap(recordAsMap);
+            })
+            .toList()
+            .cast<ChatsMessagesModel>();
+      });
     } catch (e) {
       debugPrint('Error on getChatsStream: $e');
       return const Stream.empty();
@@ -111,9 +124,6 @@ class SupabaseProviderImpl extends SupabaseProvider {
   @override
   Stream<List<ChatSummaryModel>?> getChatsStream(String myUserId) {
     try {
-      //commented because sql query not returning all rows
-      // return ChatSummaryModel.watchChats(myUserId);
-
       return _supabaseClient
           .from('chat_summary')
           .select()
@@ -139,7 +149,9 @@ class SupabaseProviderImpl extends SupabaseProvider {
   Future<void> sendMessage(
       {required ChatsMessagesModel chatsMessagesModel}) async {
     try {
-      await ChatsMessagesModel.createMessage(chatsMessagesModel);
+      await _supabaseClient
+          .from('chats_messages')
+          .insert(chatsMessagesModel.toJson());
     } catch (e) {
       debugPrint('Error on sendMessage: $e');
     }
